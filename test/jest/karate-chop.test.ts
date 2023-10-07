@@ -1,7 +1,7 @@
 import { chop } from '@/karate-chop';
 
 describe('Karate Chop', () => {
-  it('test', () => {
+  it('test chop', () => {
     expect(-1).toBe(chop(3, []));
     expect(-1).toBe(chop(3, [1]));
     expect(0).toBe(chop(1, [1]));
