@@ -1,4 +1,4 @@
-import * as fs from 'fs';
+import { readDataFromFile } from "@/file-utils";
 
 interface WeatherInfo {
   day: number
@@ -6,19 +6,14 @@ interface WeatherInfo {
   minTemperature: number
 }
 
-const readDataFromFile = (filename: string): string[] => {
-  const data = fs.readFileSync(filename, 'utf-8');
-  return data.split('\n').filter((line) => line.trim().length > 0);
-};
-
 const changeToNumber = (value: string): number => {
-  return parseInt(value.replace('*', ''))
+  return Number(value.replace('*', ''))
 }
 
-const parseWeatherInfo = (data: string[]): WeatherInfo[] => {
-  data.shift(); // remove header(first line)
-  data.pop(); // remove summary(last line)
-  return data.map(line => {
+const parseWeatherInfo = (lines: string[]): WeatherInfo[] => {
+  lines.shift(); // remove header(first line)
+  lines.pop(); // remove summary(last line)
+  return lines.map(line => {
     const [day, maxTemperature, minTemperature] = line.split(/\s+/).filter(column => column);
     return {
       day: changeToNumber(day),
@@ -39,7 +34,7 @@ const compareTemperatureSpread = (first: WeatherInfo, second: WeatherInfo): numb
   return 0;
 }
 
-export const getWeatherInfoWithSmallestTemperatureSpread = (filename: string): WeatherInfo => {
+export const findWeatherInfoWithSmallestTemperatureSpread = (filename: string): WeatherInfo => {
   const weatherData = readDataFromFile(filename);
   const weatherInfos = parseWeatherInfo(weatherData);
   return weatherInfos.sort(compareTemperatureSpread)[0];
