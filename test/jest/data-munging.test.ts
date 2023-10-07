@@ -1,7 +1,6 @@
 import { findWeatherInfoWithSmallestTemperatureSpread } from "@/weather-data";
 import { findTeamWithSmallestGoalDifference } from "@/soccer-league-table";
 
-
 describe('Data Munging', () => {
   it('Weather Data - SmallestTemperatureSpread', () => {
     const weatherInfo = findWeatherInfoWithSmallestTemperatureSpread('./data/weather.dat');

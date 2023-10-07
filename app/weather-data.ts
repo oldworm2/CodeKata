@@ -1,4 +1,4 @@
-import { readDataFromFile } from "@/file-utils";
+import { compareNumber, getColumns, readDataFromFile } from "@/utils";
 
 interface WeatherInfo {
   day: number
@@ -14,9 +14,9 @@ const parseWeatherInfo = (lines: string[]): WeatherInfo[] => {
   lines.shift(); // remove header(first line)
   lines.pop(); // remove summary(last line)
   return lines.map(line => {
-    const [day, maxTemperature, minTemperature] = line.split(/\s+/).filter(column => column);
+    const [day, maxTemperature, minTemperature] = getColumns(line);
     return {
-      day: changeToNumber(day),
+      day: Number(day),
       maxTemperature: changeToNumber(maxTemperature),
       minTemperature: changeToNumber(minTemperature),
     }
@@ -26,12 +26,7 @@ const parseWeatherInfo = (lines: string[]): WeatherInfo[] => {
 const compareTemperatureSpread = (first: WeatherInfo, second: WeatherInfo): number => {
   const firstTemperatureSpread = first.maxTemperature - first.minTemperature;
   const secondTemperatureSpread = second.maxTemperature - second.minTemperature;
-  if (firstTemperatureSpread < secondTemperatureSpread) {
-    return -1;
-  } else if (firstTemperatureSpread > secondTemperatureSpread) {
-    return 1;
-  }
-  return 0;
+  return compareNumber(firstTemperatureSpread, secondTemperatureSpread);
 }
 
 export const findWeatherInfoWithSmallestTemperatureSpread = (filename: string): WeatherInfo => {

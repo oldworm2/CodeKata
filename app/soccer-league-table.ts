@@ -1,4 +1,4 @@
-import { readDataFromFile } from "@/file-utils";
+import { compareNumber, getColumns, readDataFromFile } from "@/utils";
 
 interface TeamInfo {
   name: string;
@@ -7,30 +7,25 @@ interface TeamInfo {
 }
 
 const parseTeamInfo = (lines: string[]): TeamInfo[] => {
-  const teamData: TeamInfo[] = [];
+  const teamInfos: TeamInfo[] = [];
 
   lines.forEach((line) => {
-    const columns = line.split(/\s+/);
-    if (!isNaN(Number(columns[7])) && !isNaN(Number(columns[9]))) {
-      const teamName = columns[2];
-      const goalsFor = Number(columns[7]);
-      const goalsAgainst = Number(columns[9]);
-      teamData.push({ name: teamName, goalsFor, goalsAgainst });
+    const columns = getColumns(line);
+    if (!isNaN(Number(columns[6])) && !isNaN(Number(columns[8]))) {
+      const name = columns[1];
+      const goalsFor = Number(columns[6]);
+      const goalsAgainst = Number(columns[8]);
+      teamInfos.push({ name, goalsFor, goalsAgainst });
     }
   });
 
-  return teamData;
+  return teamInfos;
 };
 
 const compareGoalDifference = (first: TeamInfo, second: TeamInfo) => {
   const firstCoalDifference = Math.abs(first.goalsFor - first.goalsAgainst);
   const secondCoalDifference = Math.abs(second.goalsFor - second.goalsAgainst);
-  if (firstCoalDifference < secondCoalDifference) {
-    return -1;
-  } else if (firstCoalDifference > secondCoalDifference) {
-    return 1;
-  }
-  return 0;
+  return compareNumber(firstCoalDifference, secondCoalDifference);
 };
 
 export const findTeamWithSmallestGoalDifference = (filename: string): TeamInfo => {
