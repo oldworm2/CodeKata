@@ -1,4 +1,4 @@
-import { compareNumber, getColumns, readDataFromFile } from "@/utils";
+import { DataMunging } from "@/data-munging";
 
 interface WeatherInfo {
   day: number
@@ -6,31 +6,37 @@ interface WeatherInfo {
   minTemperature: number
 }
 
-const changeToNumber = (value: string): number => {
-  return Number(value.replace('*', ''))
-}
+export class WeatherData extends DataMunging {
+  weatherInfos: WeatherInfo[] = [];
+  constructor(filename: string) {
+    super(filename);
+    this.parseWeatherInfo();
+  }
 
-const parseWeatherInfo = (lines: string[]): WeatherInfo[] => {
-  lines.shift(); // remove header(first line)
-  lines.pop(); // remove summary(last line)
-  return lines.map(line => {
-    const [day, maxTemperature, minTemperature] = getColumns(line);
-    return {
-      day: Number(day),
-      maxTemperature: changeToNumber(maxTemperature),
-      minTemperature: changeToNumber(minTemperature),
-    }
-  });
-}
+  private changeToNumber = (value: string): number => {
+    return Number(value.replace('*', ''))
+  }
 
-const compareTemperatureSpread = (first: WeatherInfo, second: WeatherInfo): number => {
-  const firstTemperatureSpread = first.maxTemperature - first.minTemperature;
-  const secondTemperatureSpread = second.maxTemperature - second.minTemperature;
-  return compareNumber(firstTemperatureSpread, secondTemperatureSpread);
-}
+  private parseWeatherInfo = () => {
+    this.lines.shift(); // remove header(first line)
+    this.lines.pop(); // remove summary(last line)
+    this.weatherInfos = this.lines.map(line => {
+      const [day, maxTemperature, minTemperature] = this.getColumns(line);
+      return {
+        day: Number(day),
+        maxTemperature: this.changeToNumber(maxTemperature),
+        minTemperature: this.changeToNumber(minTemperature),
+      }
+    });
+  }
 
-export const findWeatherInfoWithSmallestTemperatureSpread = (filename: string): WeatherInfo => {
-  const weatherData = readDataFromFile(filename);
-  const weatherInfos = parseWeatherInfo(weatherData);
-  return weatherInfos.sort(compareTemperatureSpread)[0];
-};
+  private compareTemperatureSpread = (first: WeatherInfo, second: WeatherInfo): number => {
+    const firstTemperatureSpread = first.maxTemperature - first.minTemperature;
+    const secondTemperatureSpread = second.maxTemperature - second.minTemperature;
+    return this.compareNumber(firstTemperatureSpread, secondTemperatureSpread);
+  }
+
+  findWeatherInfoWithSmallestTemperatureSpread = (): WeatherInfo => {
+    return this.weatherInfos.sort(this.compareTemperatureSpread)[0];
+  }
+}
